@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <a>
+        <b attr1="value1">Text content</b>
+        <e>Some text</e>
+        <f>New element</f>
+        <g>
+            <h>Nested new element</h>
+            <i>Another nested new element</i>
+            <j>
+                <k>Yet another nested new element</k>
+            </j>
+        </g>    
+    </a>
+    <z>New element</z>
+</root>

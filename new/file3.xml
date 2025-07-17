@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <server>
+        <host>192.168.1.100</host>
+        <port>8080</port>
+        <parameters>
+            <timeout>60</timeout>
+            <retries>5</retries>
+            <newParam>true</newParam>
+        </parameters>
+    </server>
+    <database>
+        <connection>
+            <url>jdbc:mysql://localhost:3306/proddb</url>
+            <username>admin</username>
+            <password>secret</password>
+        </connection>
+        <pool>
+            <maxSize>20</maxSize>
+            <minSize>5</minSize>
+            <idleTimeout>300</idleTimeout>
+        </pool>
+    </database>
+    <logging>
+        <level>INFO</level>
+        <file>app.log</file>
+    </logging>
+</config>

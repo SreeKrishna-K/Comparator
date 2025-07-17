@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+    <category name="electronics">
+        <product id="E001">
+            <name>Smartphone Pro</name>
+            <price currency="USD">599.99</price>
+            <features>
+                <feature>5G</feature>
+                <feature>6.5 inch display</feature>
+                <feature>256GB storage</feature>
+                <feature>Water resistant</feature>
+            </features>
+            <stock>18</stock>
+        </product>
+        <product id="E003">
+            <name>Tablet</name>
+            <price currency="USD">349.99</price>
+            <features>
+                <feature>10.1 inch display</feature>
+                <feature>64GB storage</feature>
+                <feature>12MP camera</feature>
+            </features>
+            <stock>30</stock>
+        </product>
+    </category>
+    <category name="accessories">
+        <product id="A001">
+            <name>Wireless Earbuds</name>
+            <price currency="USD">79.99</price>
+            <features>
+                <feature>Bluetooth 5.0</feature>
+                <feature>24h battery life</feature>
+            </features>
+            <stock>45</stock>
+        </product>
+    </category>
+</products>

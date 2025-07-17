@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <a>
+        <b attr1="value">
+            <d>Text</d>
+        </b>
+        <c>
+            <d>Inner content</d>
+            <z>New element</z>
+        </c>
+        <e>Some text</e>
+    </a>
+</root>

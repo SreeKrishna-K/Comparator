@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+    <category name="electronics">
+        <product id="E001">
+            <name>Smartphone</name>
+            <price currency="USD">499.99</price>
+            <features>
+                <feature>5G</feature>
+                <feature>6.2 inch display</feature>
+                <feature>128GB storage</feature>
+            </features>
+            <stock>25</stock>
+        </product>
+        <product id="E002">
+            <name>Laptop</name>
+            <price currency="USD">899.99</price>
+            <features>
+                <feature>Intel i5</feature>
+                <feature>8GB RAM</feature>
+                <feature>512GB SSD</feature>
+            </features>
+            <stock>12</stock>
+        </product>
+    </category>
+</products>

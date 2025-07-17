@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <server>
+        <host>localhost</host>
+        <port>8080</port>
+        <parameters>
+            <timeout>30</timeout>
+            <retries>3</retries>
+        </parameters>
+    </server>
+    <database>
+        <connection>
+            <url>jdbc:mysql://localhost:3306/testdb</url>
+            <username>root</username>
+            <password>secret</password>
+        </connection>
+        <pool>
+            <maxSize>10</maxSize>
+            <minSize>2</minSize>
+        </pool>
+    </database>
+</config>
