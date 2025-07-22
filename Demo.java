@@ -5,6 +5,6 @@ import java.io.IOException;
 
 public class Demo {
     public static void main(String[] args) {
-        JsonToObjectGenerator.processJsonFile("e:\\Office Rough\\JsonToObjectGenCode\\sample_data.json", "A");
+        JsonToObjectGenerator.processJsonFile("e:\\Office Rough\\JsonToObjectGenCode\\sample_data.json", A.class);
     }
 }

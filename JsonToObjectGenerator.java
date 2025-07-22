@@ -134,7 +134,7 @@ public class JsonToObjectGenerator {
     }
     
     // Process JSON file and generate object code
-    public static void processJsonFile(String filePath, String className) {
+    public static void processJsonFile(String filePath, Class<?> targetClass) {
         try {
             String json = new String(Files.readAllBytes(Paths.get(filePath)));
             System.out.println("JSON loaded from: " + filePath);
@@ -142,7 +142,6 @@ public class JsonToObjectGenerator {
             System.out.println(json);
             System.out.println("\n" + "=".repeat(50));
             
-            Class<?> targetClass = Class.forName(className);
             String code = generateObjectCode(targetClass, json);
             
             System.out.println("Generated Object Creation Code:");
@@ -151,8 +150,6 @@ public class JsonToObjectGenerator {
             
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            System.err.println("Class not found: " + className);
         } catch (Exception e) {
             System.err.println("Error processing JSON: " + e.getMessage());
             e.printStackTrace();
@@ -161,6 +158,6 @@ public class JsonToObjectGenerator {
     
     // Main method with single function call
     public static void main(String[] args) {
-        processJsonFile("e:\\Office Rough\\JsonToObjectGenCode\\sample_data.json", "A");
+        processJsonFile("e:\\Office Rough\\JsonToObjectGenCode\\sample_data.json", A.class);
     }
 }
