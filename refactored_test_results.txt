@@ -1,6 +1,6 @@
-=== Comprehensive JsonToObjectGenerator Test Results ===
+=== Refactored JsonToObjectGenerator Test Results ===
 
-1. Testing List<Employee> (Original Functionality):
+1. Testing List<Employee> (Refactored Version):
 ============================================================
 List<Employee> employeesCollection = new ArrayList<>();
 Employee employee = new Employee();
@@ -18,7 +18,7 @@ Company company = new Company();
 company.setName("Company");
 company.setEmployees(employeesCollection);
 
-2. Testing All Collection Types (Department):
+2. Testing All Collection Types (Refactored Version):
 ============================================================
 List<Employee> employeesCollection = new ArrayList<>();
 Employee employee = new Employee();
@@ -70,7 +70,7 @@ department.setTasks(tasksCollection);
 department.setPriorities(prioritiesCollection);
 department.setResources(resourcesCollection);
 
-3. Testing Composite Design Pattern (TreeNode):
+3. Testing Composite Design Pattern (Refactored Version):
 ============================================================
 TreeNode treenode2 = new TreeNode();
 treenode2.setName("Left-Left Child");
@@ -91,7 +91,7 @@ treenode.setName("Root Node");
 treenode.setLeftChild(treenode1);
 treenode.setRightChild(treenode4);
 
-4. Testing Simple Nested Object (A with B):
+4. Testing Simple Nested Object (Refactored Version):
 ============================================================
 B b = new B();
 b.setX(10);

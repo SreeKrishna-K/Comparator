@@ -17,7 +17,7 @@ import java.io.IOException;
  * - Recursive data structures
  * - Unique variable naming
  */
-public class JsonToObjectGenerator {
+public class JsonToObjectGeneratorRefactored {
     
     // ========================================================================================
     // CONSTANTS AND CONFIGURATION
