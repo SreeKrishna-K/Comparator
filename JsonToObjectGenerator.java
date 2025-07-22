@@ -41,11 +41,6 @@ public class JsonToObjectGenerator {
                     // Handle nested objects
                     if (!isPrimitiveOrString(fieldType) && jsonElement.isJsonObject()) {
                         String nestedVarName = fieldName;
-                        String nestedClassName = fieldType.getSimpleName();
-                        
-                        // Create nested object first
-                        code.append(nestedClassName).append(" ").append(nestedVarName)
-                            .append(" = new ").append(nestedClassName).append("();\n");
                         
                         // Recursively generate code for nested object
                         generateCodeRecursive(fieldType, jsonElement.getAsJsonObject(), 
