@@ -1,0 +1,49 @@
+List<Employee> employeesCollection = new ArrayList<>();
+Employee employee = new Employee();
+employee.setName("Alice");
+employee.setAge(28);
+
+employeesCollection.add(employee);
+Employee employee1 = new Employee();
+employee1.setName("Bob");
+employee1.setAge(32);
+
+employeesCollection.add(employee1);
+Employee employee2 = new Employee();
+employee2.setName("Charlie");
+employee2.setAge(26);
+
+employeesCollection.add(employee2);
+
+Set<Object> skillsCollection = new HashSet<>();
+skillsCollection.add("Java");
+skillsCollection.add("Python");
+skillsCollection.add("JavaScript");
+skillsCollection.add("React");
+skillsCollection.add("Spring Boot");
+
+Queue<Object> tasksCollection = new LinkedList<>();
+tasksCollection.offer("Code Review");
+tasksCollection.offer("Bug Fixing");
+tasksCollection.offer("Feature Development");
+tasksCollection.offer("Testing");
+
+Deque<Object> prioritiesCollection = new ArrayDeque<>();
+prioritiesCollection.add("High");
+prioritiesCollection.add("Medium");
+prioritiesCollection.add("Low");
+prioritiesCollection.add("Critical");
+
+Collection<Object> resourcesCollection = new ArrayList<>();
+resourcesCollection.add("Laptop");
+resourcesCollection.add("Monitor");
+resourcesCollection.add("IDE License");
+resourcesCollection.add("Cloud Access");
+
+Department department = new Department();
+department.setName("Engineering Department");
+department.setEmployees(employeesCollection);
+department.setSkills(skillsCollection);
+department.setTasks(tasksCollection);
+department.setPriorities(prioritiesCollection);
+department.setResources(resourcesCollection);

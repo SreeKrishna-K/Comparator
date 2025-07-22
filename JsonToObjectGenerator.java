@@ -1,6 +1,7 @@
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
+import java.util.concurrent.*;
 import com.google.gson.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -45,7 +46,41 @@ public class JsonToObjectGenerator {
         return candidateName;
     }
     
-    // Get element type for List/Array fields using reflection or heuristics
+    // Determine the appropriate collection implementation for a given interface
+    private static String getCollectionImplementation(Class<?> collectionType) {
+        if (java.util.List.class.isAssignableFrom(collectionType)) {
+            return "ArrayList";
+        } else if (java.util.Set.class.isAssignableFrom(collectionType)) {
+            if (java.util.SortedSet.class.isAssignableFrom(collectionType) || 
+                java.util.NavigableSet.class.isAssignableFrom(collectionType)) {
+                return "TreeSet";
+            } else if (java.util.LinkedHashSet.class.isAssignableFrom(collectionType)) {
+                return "LinkedHashSet";
+            } else {
+                return "HashSet";
+            }
+        } else if (java.util.Queue.class.isAssignableFrom(collectionType)) {
+            if (java.util.Deque.class.isAssignableFrom(collectionType)) {
+                return "ArrayDeque";
+            } else if (java.util.concurrent.BlockingQueue.class.isAssignableFrom(collectionType)) {
+                return "LinkedBlockingQueue";
+            } else {
+                return "LinkedList";
+            }
+        } else if (java.util.Collection.class.isAssignableFrom(collectionType)) {
+            // Generic Collection interface - default to ArrayList
+            return "ArrayList";
+        }
+        return "ArrayList"; // Default fallback
+    }
+    
+    // Check if a field type is any kind of collection (including arrays)
+    private static boolean isCollectionType(Class<?> fieldType) {
+        return fieldType.isArray() || 
+               java.util.Collection.class.isAssignableFrom(fieldType);
+    }
+    
+    // Get element type for Collection/Array fields using reflection or heuristics
     private static Class<?> getElementType(Field field, JsonArray jsonArray) {
         try {
             // For arrays, get component type directly
@@ -130,18 +165,16 @@ public class JsonToObjectGenerator {
                         
                         nestedVariables.put(fieldName, nestedVarName);
                     }
-                    // Handle arrays and lists
-                    else if ((fieldType.isArray() || java.util.List.class.isAssignableFrom(fieldType)) 
-                            && jsonElement.isJsonArray()) {
+                    // Handle all collection types (arrays, lists, sets, queues, etc.)
+                    else if (isCollectionType(fieldType) && jsonElement.isJsonArray()) {
                         JsonArray jsonArray = jsonElement.getAsJsonArray();
-                        String arrayVarName = generateUniqueVariableName(fieldName + "Array");
+                        String collectionVarName = generateUniqueVariableName(fieldName + "Collection");
                         
-                        // Get element type for arrays/lists
+                        // Get element type for collections
                         Class<?> elementType = getElementType(field, jsonArray);
                         
-                        // Force Employee type for employees array/list to fix the specific issue
-                        if (fieldName.equals("employees") && 
-                            (fieldType.isArray() || java.util.List.class.isAssignableFrom(fieldType))) {
+                        // Force Employee type for employees collection to fix the specific issue
+                        if (fieldName.equals("employees") && isCollectionType(fieldType)) {
                             try {
                                 elementType = Class.forName("Employee");
                             } catch (ClassNotFoundException e) {
@@ -150,10 +183,10 @@ public class JsonToObjectGenerator {
                             }
                         }
                         
-                        // Handle array field with new helper method
-                        handleArrayField(fieldType, jsonArray, arrayVarName, code, elementType);
+                        // Handle collection field with unified method
+                        handleCollectionField(fieldType, jsonArray, collectionVarName, code, elementType);
                         
-                        nestedVariables.put(fieldName, arrayVarName);
+                        nestedVariables.put(fieldName, collectionVarName);
                     }
                 }
             }
@@ -235,67 +268,116 @@ public class JsonToObjectGenerator {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
     
-    // Handle array/list fields with proper nested object support
-    private static void handleArrayField(Class<?> fieldType, JsonArray jsonArray, String arrayVarName, StringBuilder code, Class<?> elementType) {
+    // Handle all collection types (List, Set, Queue, Deque, etc.) with proper nested object support
+    private static void handleCollectionField(Class<?> fieldType, JsonArray jsonArray, String collectionVarName, StringBuilder code, Class<?> elementType) {
         try {
-            if (java.util.List.class.isAssignableFrom(fieldType)) {
-                // Create ArrayList with proper generic type
-                String elementTypeName = elementType != null ? elementType.getSimpleName() : "Object";
-                code.append("List<").append(elementTypeName).append("> ").append(arrayVarName).append(" = new ArrayList<>();\n");
-                
-                // Process each element in the array
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    JsonElement element = jsonArray.get(i);
-                    
-                    if (element.isJsonObject() && elementType != null) {
-                        // Important: Create nested object recursively
-                        String elementVarName = generateUniqueVariableName(elementType.getSimpleName().toLowerCase());
-                        // Use a new HashSet for each recursive call to avoid conflicts
-                        generateCodeRecursive(elementType, element.getAsJsonObject(), elementVarName, code, new HashSet<>());
-                        code.append(arrayVarName).append(".add(").append(elementVarName).append(");\n");
-                    } else if (element.isJsonPrimitive()) {
-                        // Handle primitive values
-                        JsonPrimitive primitive = element.getAsJsonPrimitive();
-                        if (primitive.isString()) {
-                            code.append(arrayVarName).append(".add(\"").append(primitive.getAsString()).append("\");\n");
-                        } else if (primitive.isNumber()) {
-                            code.append(arrayVarName).append(".add(").append(primitive.getAsNumber()).append(");\n");
-                        } else if (primitive.isBoolean()) {
-                            code.append(arrayVarName).append(".add(").append(primitive.getAsBoolean()).append(");\n");
-                        }
-                    } else {
-                        // Handle null or unexpected element type
-                        code.append("// Warning: Unhandled element type in array: ").append(element).append("\n");
-                        code.append(arrayVarName).append(".add(null);\n");
-                    }
-                }
-            } else if (fieldType.isArray()) {
-                // Handle arrays
-                String elementTypeName = fieldType.getComponentType().getSimpleName();
-                code.append(elementTypeName).append("[] ").append(arrayVarName).append(" = new ").append(elementTypeName).append("[").append(jsonArray.size()).append("];\n");
-                
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    JsonElement element = jsonArray.get(i);
-                    if (element.isJsonObject() && !isPrimitiveOrString(fieldType.getComponentType())) {
-                        String elementVarName = generateUniqueVariableName(fieldType.getComponentType().getSimpleName().toLowerCase());
-                        // Use a new HashSet for each recursive call to avoid conflicts
-                        generateCodeRecursive(fieldType.getComponentType(), element.getAsJsonObject(), elementVarName, code, new HashSet<>());
-                        code.append(arrayVarName).append("[").append(i).append("] = ").append(elementVarName).append(";\n");
-                    } else if (element.isJsonPrimitive() && isPrimitiveOrString(fieldType.getComponentType())) {
-                        // Handle primitive array elements
-                        JsonPrimitive primitive = element.getAsJsonPrimitive();
-                        String value = getValueAsString(primitive, fieldType.getComponentType());
-                        code.append(arrayVarName).append("[").append(i).append("] = ").append(value).append(";\n");
-                    }
-                }
+            if (fieldType.isArray()) {
+                // Handle arrays (special case)
+                handleArrayType(fieldType, jsonArray, collectionVarName, code, elementType);
+            } else if (java.util.Collection.class.isAssignableFrom(fieldType)) {
+                // Handle all Collection subtypes (List, Set, Queue, etc.)
+                handleCollectionType(fieldType, jsonArray, collectionVarName, code, elementType);
             }
             
             code.append("\n");
             
         } catch (Exception e) {
-            code.append("// Error handling array field: ").append(e.getMessage()).append("\n");
+            code.append("// Error handling collection field: ").append(e.getMessage()).append("\n");
             e.printStackTrace();
         }
+    }
+    
+    // Handle array types specifically
+    private static void handleArrayType(Class<?> fieldType, JsonArray jsonArray, String arrayVarName, StringBuilder code, Class<?> elementType) {
+        String elementTypeName = fieldType.getComponentType().getSimpleName();
+        code.append(elementTypeName).append("[] ").append(arrayVarName).append(" = new ").append(elementTypeName).append("[").append(jsonArray.size()).append("];\n");
+        
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JsonElement element = jsonArray.get(i);
+            if (element.isJsonObject() && !isPrimitiveOrString(fieldType.getComponentType())) {
+                String elementVarName = generateUniqueVariableName(fieldType.getComponentType().getSimpleName().toLowerCase());
+                generateCodeRecursive(fieldType.getComponentType(), element.getAsJsonObject(), elementVarName, code, new HashSet<>());
+                code.append(arrayVarName).append("[").append(i).append("] = ").append(elementVarName).append(";\n");
+            } else if (element.isJsonPrimitive() && isPrimitiveOrString(fieldType.getComponentType())) {
+                JsonPrimitive primitive = element.getAsJsonPrimitive();
+                String value = getValueAsString(primitive, fieldType.getComponentType());
+                code.append(arrayVarName).append("[").append(i).append("] = ").append(value).append(";\n");
+            }
+        }
+    }
+    
+    // Handle Collection types (List, Set, Queue, Deque, etc.)
+    private static void handleCollectionType(Class<?> fieldType, JsonArray jsonArray, String collectionVarName, StringBuilder code, Class<?> elementType) {
+        String elementTypeName = elementType != null ? elementType.getSimpleName() : "Object";
+        String implementation = getCollectionImplementation(fieldType);
+        String interfaceName = getCollectionInterfaceName(fieldType);
+        
+        // Create collection with proper generic type and implementation
+        code.append(interfaceName).append("<").append(elementTypeName).append("> ")
+            .append(collectionVarName).append(" = new ").append(implementation).append("<>();\n");
+        
+        // Process each element in the JSON array
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JsonElement element = jsonArray.get(i);
+            
+            if (element.isJsonObject() && elementType != null) {
+                // Create nested object recursively
+                String elementVarName = generateUniqueVariableName(elementType.getSimpleName().toLowerCase());
+                generateCodeRecursive(elementType, element.getAsJsonObject(), elementVarName, code, new HashSet<>());
+                addElementToCollection(fieldType, collectionVarName, elementVarName, code);
+            } else if (element.isJsonPrimitive()) {
+                // Handle primitive values
+                JsonPrimitive primitive = element.getAsJsonPrimitive();
+                String value = getPrimitiveValue(primitive);
+                addElementToCollection(fieldType, collectionVarName, value, code);
+            } else {
+                // Handle null or unexpected element type
+                code.append("// Warning: Unhandled element type in collection: ").append(element).append("\n");
+                addElementToCollection(fieldType, collectionVarName, "null", code);
+            }
+        }
+    }
+    
+    // Get the appropriate interface name for declaration
+    private static String getCollectionInterfaceName(Class<?> collectionType) {
+        if (java.util.List.class.isAssignableFrom(collectionType)) {
+            return "List";
+        } else if (java.util.Set.class.isAssignableFrom(collectionType)) {
+            return "Set";
+        } else if (java.util.Queue.class.isAssignableFrom(collectionType)) {
+            if (java.util.Deque.class.isAssignableFrom(collectionType)) {
+                return "Deque";
+            } else {
+                return "Queue";
+            }
+        } else if (java.util.Collection.class.isAssignableFrom(collectionType)) {
+            return "Collection";
+        }
+        return "Collection"; // Default fallback
+    }
+    
+    // Add element to collection using appropriate method
+    private static void addElementToCollection(Class<?> collectionType, String collectionVarName, String elementValue, StringBuilder code) {
+        if (java.util.Queue.class.isAssignableFrom(collectionType) && 
+            !java.util.Deque.class.isAssignableFrom(collectionType)) {
+            // Use offer() for Queue (but not Deque)
+            code.append(collectionVarName).append(".offer(").append(elementValue).append(");\n");
+        } else {
+            // Use add() for List, Set, Deque, and generic Collection
+            code.append(collectionVarName).append(".add(").append(elementValue).append(");\n");
+        }
+    }
+    
+    // Get primitive value as string for collection elements
+    private static String getPrimitiveValue(JsonPrimitive primitive) {
+        if (primitive.isString()) {
+            return "\""+primitive.getAsString()+"\"";
+        } else if (primitive.isNumber()) {
+            return primitive.getAsNumber().toString();
+        } else if (primitive.isBoolean()) {
+            return primitive.getAsBoolean() ? "true" : "false";
+        }
+        return "null";
     }
     
     // Process JSON file and generate object code

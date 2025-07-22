@@ -1,0 +1,42 @@
+{
+  "name": "Engineering Department",
+  "employees": [
+    {
+      "name": "Alice",
+      "age": 28
+    },
+    {
+      "name": "Bob",
+      "age": 32
+    },
+    {
+      "name": "Charlie",
+      "age": 26
+    }
+  ],
+  "skills": [
+    "Java",
+    "Python",
+    "JavaScript",
+    "React",
+    "Spring Boot"
+  ],
+  "tasks": [
+    "Code Review",
+    "Bug Fixing",
+    "Feature Development",
+    "Testing"
+  ],
+  "priorities": [
+    "High",
+    "Medium",
+    "Low",
+    "Critical"
+  ],
+  "resources": [
+    "Laptop",
+    "Monitor",
+    "IDE License",
+    "Cloud Access"
+  ]
+}
