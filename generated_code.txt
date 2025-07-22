@@ -1,0 +1,15 @@
+List<Employee> employeesArray = new ArrayList<>();
+Employee employee = new Employee();
+employee.setName("John");
+employee.setAge(30);
+
+employeesArray.add(employee);
+Employee employee1 = new Employee();
+employee1.setName("Jane");
+employee1.setAge(25);
+
+employeesArray.add(employee1);
+
+Company company = new Company();
+company.setName("Acme Corp");
+company.setEmployees(employeesArray);

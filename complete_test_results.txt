@@ -1,0 +1,50 @@
+=== Complete JsonToObjectGenerator Test Results ===
+
+1. Testing Composite Design Pattern (TreeNode):
+==================================================
+TreeNode treenode2 = new TreeNode();
+treenode2.setName("Left-Left Child");
+
+TreeNode treenode3 = new TreeNode();
+treenode3.setName("Left-Right Child");
+
+TreeNode treenode1 = new TreeNode();
+treenode1.setName("Left Child");
+treenode1.setLeftChild(treenode2);
+treenode1.setRightChild(treenode3);
+
+TreeNode treenode4 = new TreeNode();
+treenode4.setName("Right Child");
+
+TreeNode treenode = new TreeNode();
+treenode.setName("Root Node");
+treenode.setLeftChild(treenode1);
+treenode.setRightChild(treenode4);
+
+2. Testing Array/List Handling (Company with Employees):
+==================================================
+List<Employee> employeesArray = new ArrayList<>();
+Employee employee = new Employee();
+employee.setName("John");
+employee.setAge(30);
+
+employeesArray.add(employee);
+Employee employee1 = new Employee();
+employee1.setName("Jane");
+employee1.setAge(25);
+
+employeesArray.add(employee1);
+
+Company company = new Company();
+company.setName("Company");
+company.setEmployees(employeesArray);
+
+3. Testing Simple Nested Object (A with B):
+==================================================
+B b = new B();
+b.setX(10);
+
+A a = new A();
+a.setA("Krishna");
+a.setB(b);
+

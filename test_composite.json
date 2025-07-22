@@ -1,0 +1,21 @@
+{
+  "name": "Root Node",
+  "leftChild": {
+    "name": "Left Child",
+    "leftChild": {
+      "name": "Left-Left Child",
+      "leftChild": null,
+      "rightChild": null
+    },
+    "rightChild": {
+      "name": "Left-Right Child",
+      "leftChild": null,
+      "rightChild": null
+    }
+  },
+  "rightChild": {
+    "name": "Right Child",
+    "leftChild": null,
+    "rightChild": null
+  }
+}
