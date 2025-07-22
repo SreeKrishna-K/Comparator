@@ -1,6 +1,9 @@
 import java.lang.reflect.Field;
 import java.util.*;
 import com.google.gson.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
 
 public class JsonToObjectGenerator {
     
@@ -130,31 +133,34 @@ public class JsonToObjectGenerator {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
     
-    // Test method
-    public static void main(String[] args) {
-        // Example usage - you would replace these with your actual classes
+    // Process JSON file and generate object code
+    public static void processJsonFile(String filePath, String className) {
         try {
-            // For demonstration, we'll simulate with the example you provided
-            String json = "{\n" +
-                         "  \"a\":\"Krishna\",\n" +
-                         "  \"b\": {\n" +
-                         "     \"x\":10\n" +
-                         "  }\n" +
-                         "}";
+            String json = new String(Files.readAllBytes(Paths.get(filePath)));
+            System.out.println("JSON loaded from: " + filePath);
+            System.out.println("JSON Content:");
+            System.out.println(json);
+            System.out.println("\n" + "=".repeat(50));
             
-            System.out.println("Generated Code:");
-            System.out.println("===============");
+            Class<?> targetClass = Class.forName(className);
+            String code = generateObjectCode(targetClass, json);
             
-            // You would call it like this with your actual class:
-            // String code = generateObjectCode(A.class, json);
-            // System.out.println(code);
+            System.out.println("Generated Object Creation Code:");
+            System.out.println("=".repeat(50));
+            System.out.println(code);
             
-            System.out.println("// To use this generator:");
-            System.out.println("// String code = JsonToObjectGenerator.generateObjectCode(YourClass.class, jsonString);");
-            System.out.println("// System.out.println(code);");
-            
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.err.println("Class not found: " + className);
         } catch (Exception e) {
+            System.err.println("Error processing JSON: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    
+    // Main method with single function call
+    public static void main(String[] args) {
+        processJsonFile("e:\\Office Rough\\JsonToObjectGenCode\\sample_data.json", "A");
     }
 }
