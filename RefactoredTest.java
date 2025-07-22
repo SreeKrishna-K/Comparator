@@ -12,28 +12,28 @@ public class RefactoredTest {
             output.append("1. Testing List<Employee> (Refactored Version):\n");
             output.append("=" .repeat(60)).append("\n");
             String arrayJson = new String(Files.readAllBytes(Paths.get("e:\\Office Rough\\JsonToObjectGenCode\\test_array.json")));
-            String arrayCode = JsonToObjectGeneratorRefactored.generateObjectCode(Company.class, arrayJson);
+            String arrayCode = JsonToObjectGenerator.generateObjectCode(Company.class, arrayJson);
             output.append(arrayCode).append("\n\n");
             
             // Test 2: All Collection Types
             output.append("2. Testing All Collection Types (Refactored Version):\n");
             output.append("=" .repeat(60)).append("\n");
             String collectionJson = new String(Files.readAllBytes(Paths.get("e:\\Office Rough\\JsonToObjectGenCode\\test_collections.json")));
-            String collectionCode = JsonToObjectGeneratorRefactored.generateObjectCode(Department.class, collectionJson);
+            String collectionCode = JsonToObjectGenerator.generateObjectCode(Department.class, collectionJson);
             output.append(collectionCode).append("\n\n");
             
             // Test 3: Composite Design Pattern
             output.append("3. Testing Composite Design Pattern (Refactored Version):\n");
             output.append("=" .repeat(60)).append("\n");
             String compositeJson = new String(Files.readAllBytes(Paths.get("e:\\Office Rough\\JsonToObjectGenCode\\test_composite.json")));
-            String compositeCode = JsonToObjectGeneratorRefactored.generateObjectCode(TreeNode.class, compositeJson);
+            String compositeCode = JsonToObjectGenerator.generateObjectCode(TreeNode.class, compositeJson);
             output.append(compositeCode).append("\n\n");
             
             // Test 4: Simple Nested Object
             output.append("4. Testing Simple Nested Object (Refactored Version):\n");
             output.append("=" .repeat(60)).append("\n");
             String simpleJson = new String(Files.readAllBytes(Paths.get("e:\\Office Rough\\JsonToObjectGenCode\\sample_data.json")));
-            String simpleCode = JsonToObjectGeneratorRefactored.generateObjectCode(A.class, simpleJson);
+            String simpleCode = JsonToObjectGenerator.generateObjectCode(A.class, simpleJson);
             output.append(simpleCode).append("\n\n");
             
             // Write all results to file
