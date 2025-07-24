@@ -353,7 +353,7 @@ public class JsonToObjectGenerator {
                 elementType = handleSpecialCases(field.getName(), fieldType, elementType);
                 
                 CollectionCodeGenerator.generate(fieldType, jsonArray, collectionVarName, 
-                                               code, elementType);
+                                               code, elementType, field);
                 
                 nestedVariables.put(field.getName(), collectionVarName);
                 return true;
@@ -427,12 +427,12 @@ public class JsonToObjectGenerator {
         
         public static void generate(Class<?> fieldType, JsonArray jsonArray, 
                                   String collectionVarName, StringBuilder code, 
-                                  Class<?> elementType) {
+                                  Class<?> elementType, Field originalField) {
             try {
                 if (fieldType.isArray()) {
                     generateArrayCode(fieldType, jsonArray, collectionVarName, code, elementType);
                 } else if (Collection.class.isAssignableFrom(fieldType)) {
-                    generateCollectionCode(fieldType, jsonArray, collectionVarName, code, elementType);
+                    generateCollectionCode(fieldType, jsonArray, collectionVarName, code, elementType, originalField);
                 }
                 code.append("\n");
             } catch (Exception e) {
@@ -456,7 +456,7 @@ public class JsonToObjectGenerator {
         }
         
         private static void processArrayElement(Class<?> fieldType, JsonElement element, 
-                                             String arrayVarName, int index, StringBuilder code) {
+                                              String arrayVarName, int index, StringBuilder code) {
             if (element.isJsonObject() && !TypeAnalyzer.isPrimitiveOrString(fieldType.getComponentType())) {
                 String elementVarName = VariableNameManager.generateUnique(
                     fieldType.getComponentType().getSimpleName().toLowerCase());
@@ -473,19 +473,31 @@ public class JsonToObjectGenerator {
         
         private static void generateCollectionCode(Class<?> fieldType, JsonArray jsonArray, 
                                                  String collectionVarName, StringBuilder code, 
-                                                 Class<?> elementType) {
+                                                 Class<?> elementType, Field originalField) {
             String elementTypeName = elementType != null ? elementType.getSimpleName() : DEFAULT_ELEMENT_TYPE;
             String implementation = CollectionHandler.getImplementation(fieldType);
-            String interfaceName = CollectionHandler.getInterfaceName(fieldType);
             
-            // Create collection declaration
-            code.append(interfaceName).append("<").append(elementTypeName).append("> ")
+            // Use the original field type name instead of generic interface name
+            String fieldTypeName = getOriginalFieldTypeName(originalField, fieldType);
+            
+            // Create collection declaration with original field type
+            code.append(fieldTypeName).append("<").append(elementTypeName).append("> ")
                 .append(collectionVarName).append(" = new ").append(implementation).append("<>();\n");
             
             // Process each element
             for (JsonElement element : jsonArray) {
                 processCollectionElement(fieldType, element, collectionVarName, code, elementType);
             }
+        }
+        
+        private static String getOriginalFieldTypeName(Field originalField, Class<?> fieldType) {
+            if (originalField != null) {
+                // Get the actual declared type from the field
+                Class<?> declaredType = originalField.getType();
+                return declaredType.getSimpleName();
+            }
+            // Fallback to interface name if field is not available
+            return CollectionHandler.getInterfaceName(fieldType);
         }
         
         private static void processCollectionElement(Class<?> fieldType, JsonElement element, 
@@ -521,7 +533,7 @@ public class JsonToObjectGenerator {
                 JsonPrimitive primitive = element.getAsJsonPrimitive();
                 
                 if (type == String.class && primitive.isString()) {
-                    return "\"" + primitive.getAsString() + "\"";
+                    return "\"" + escapeString(primitive.getAsString()) + "\"";
                 } else if ((type == int.class || type == Integer.class) && primitive.isNumber()) {
                     return String.valueOf(primitive.getAsInt());
                 } else if ((type == long.class || type == Long.class) && primitive.isNumber()) {
@@ -533,25 +545,55 @@ public class JsonToObjectGenerator {
                 } else if ((type == boolean.class || type == Boolean.class) && primitive.isBoolean()) {
                     return String.valueOf(primitive.getAsBoolean());
                 } else if ((type == char.class || type == Character.class) && primitive.isString()) {
-                    return "'" + primitive.getAsString().charAt(0) + "'";
+                    return "'" + escapeChar(primitive.getAsString().charAt(0)) + "'";
                 } else if ((type == byte.class || type == Byte.class) && primitive.isNumber()) {
                     return "(byte)" + primitive.getAsByte();
                 } else if ((type == short.class || type == Short.class) && primitive.isNumber()) {
                     return "(short)" + primitive.getAsShort();
                 }
             }
-            return element.getAsString();
+            return escapeString(element.getAsString());
         }
         
         public static String getPrimitiveValue(JsonPrimitive primitive) {
             if (primitive.isString()) {
-                return "\"" + primitive.getAsString() + "\"";
+                return "\"" + escapeString(primitive.getAsString()) + "\"";
             } else if (primitive.isNumber()) {
                 return primitive.getAsNumber().toString();
             } else if (primitive.isBoolean()) {
                 return primitive.getAsBoolean() ? "true" : "false";
             }
             return "null";
+        }
+        
+        /**
+         * Escape special characters in strings for Java code generation
+         */
+        private static String escapeString(String str) {
+            if (str == null) return "";
+            return str.replace("\\", "\\\\")
+                     .replace("\"", "\\\"")
+                     .replace("\n", "\\n")
+                     .replace("\r", "\\r")
+                     .replace("\t", "\\t")
+                     .replace("\b", "\\b")
+                     .replace("\f", "\\f");
+        }
+        
+        /**
+         * Escape special characters in char literals for Java code generation
+         */
+        private static String escapeChar(char c) {
+            switch (c) {
+                case '\\': return "\\\\";
+                case '\'': return "\\\'";
+                case '\n': return "\\n";
+                case '\r': return "\\r";
+                case '\t': return "\\t";
+                case '\b': return "\\b";
+                case '\f': return "\\f";
+                default: return String.valueOf(c);
+            }
         }
     }
     

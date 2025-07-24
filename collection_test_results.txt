@@ -1,4 +1,4 @@
-List<Employee> employeesCollection = new ArrayList<>();
+Collection<Employee> employeesCollection = new ArrayList<>();
 Employee employee = new Employee();
 employee.setName("Alice");
 employee.setAge(28);
@@ -15,26 +15,26 @@ employee2.setAge(26);
 
 employeesCollection.add(employee2);
 
-Set<Object> skillsCollection = new HashSet<>();
+Set<String> skillsCollection = new HashSet<>();
 skillsCollection.add("Java");
 skillsCollection.add("Python");
 skillsCollection.add("JavaScript");
 skillsCollection.add("React");
 skillsCollection.add("Spring Boot");
 
-Queue<Object> tasksCollection = new LinkedList<>();
+Collection<String> tasksCollection = new ArrayList<>();
 tasksCollection.offer("Code Review");
 tasksCollection.offer("Bug Fixing");
 tasksCollection.offer("Feature Development");
 tasksCollection.offer("Testing");
 
-Deque<Object> prioritiesCollection = new ArrayDeque<>();
+Deque<String> prioritiesCollection = new ArrayList<>();
 prioritiesCollection.add("High");
 prioritiesCollection.add("Medium");
 prioritiesCollection.add("Low");
 prioritiesCollection.add("Critical");
 
-Collection<Object> resourcesCollection = new ArrayList<>();
+Collection<String> resourcesCollection = new ArrayList<>();
 resourcesCollection.add("Laptop");
 resourcesCollection.add("Monitor");
 resourcesCollection.add("IDE License");
